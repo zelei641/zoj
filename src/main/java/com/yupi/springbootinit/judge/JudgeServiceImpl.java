@@ -45,6 +45,7 @@ public class JudgeServiceImpl implements JudgeService{
         //拿到提交信息
         QuestionSubmit questionSubmit = questionSubmitService.getById(questionSubmitId);
 
+
         if (questionSubmit == null)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "提交信息不存在");
@@ -86,6 +87,7 @@ public class JudgeServiceImpl implements JudgeService{
                 .input(inputList)
                 .language(language)
                 .build();
+        System.out.println("fesadfasdf");
         ExecuteCodeResponse executeCodeResponse = codeSandbox.executeCode(build);
         List<String> outputList = executeCodeResponse.getOutput();
 
@@ -97,6 +99,7 @@ public class JudgeServiceImpl implements JudgeService{
         judgeConext.setQuestion(question);
         judgeConext.setJudgeCaseList(judgeCasesList);
         judgeConext.setQuestionSubmit(questionSubmit);
+        //处理结果
         JudgeInfo judgeInfo = judgeManager.doJudge(judgeConext);
 
         //7)修改数据库中的判题结果

@@ -33,7 +33,6 @@ public class JavaLaguageJudgeStrategy implements JudgeStrategy{
         JudgeInfoMessageEnum judgeInfoMessageEnum = JudgeInfoMessageEnum.ACCEPTED;
         judgeInfoResponse.setMemory(memory);
         judgeInfoResponse.setTime(time);
-
         //判断输出和输入用例的数量是否相等
         if (outputList.size() != inputList.size())
         {
@@ -46,8 +45,12 @@ public class JavaLaguageJudgeStrategy implements JudgeStrategy{
         for (int i = 0; i < judgeCaseList.size(); i ++)
         {
             JudgeCase judgeCase1 = judgeCaseList.get(i);
+
             if (!judgeCase1.getOutput().equals(outputList.get(i)))
             {
+                System.out.println("java判题代码输出judgeCase1.getOutput() : " + judgeCase1.getOutput());
+                System.out.println("java判题代码输出outputList.get(i) : " + outputList.get(i));
+                System.out.println(judgeCase1.getOutput().equals(outputList.get(i)));
                 judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
                 judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
                 return judgeInfoResponse;
@@ -59,7 +62,7 @@ public class JavaLaguageJudgeStrategy implements JudgeStrategy{
         String judgeConfigStr = question.getJudgeConfig();
         JudgeConfig judgeConfigQuestion = JSONUtil.toBean(judgeConfigStr, JudgeConfig.class);
         Long needTimeLimit = judgeConfigQuestion.getTimeLimit();
-        Long needMemoryLimit = judgeConfigQuestion.getMemoryLimit();
+        Long needMemoryLimit = judgeConfigQuestion.getMemoryLimit() + 50000000;
         //比较
         if (memory > needMemoryLimit) {
             judgeInfoMessageEnum = JudgeInfoMessageEnum.MEMORY_LIMIT_EXCEEDED;

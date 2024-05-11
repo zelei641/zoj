@@ -20,10 +20,12 @@ public class JudgeManager
         QuestionSubmit questionSubmit = judgeConext.getQuestionSubmit();
         String language = questionSubmit.getLanguage();
         JudgeStrategy judgeStrategy = new DefaultJudgeStrategy();
-        if (language.equals("java"))
-        {
+
+        //if (language.equals("java"))
+       // {
             judgeStrategy = new JavaLaguageJudgeStrategy();
-        }
+        //}
+
 
         return judgeStrategy.doJudge(judgeConext);
     }
