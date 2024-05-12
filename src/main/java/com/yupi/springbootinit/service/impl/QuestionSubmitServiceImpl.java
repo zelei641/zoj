@@ -24,6 +24,7 @@ import com.yupi.springbootinit.service.UserService;
 import com.yupi.springbootinit.utils.SqlUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +75,12 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "编程语言不存在");
         }
 
+        //更改题目提交数据
+        Question questionUpdate = new Question();
+        BeanUtils.copyProperties(question, questionUpdate);
+        Integer submitNum = question.getSubmitNum();
+        questionUpdate.setSubmitNum(submitNum + 1);
+
 
         // 是否已提交题目
         long userId = loginUser.getId();
@@ -87,6 +94,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         questionSubmit.setCode(doQuestionSubmit.getCode());
         questionSubmit.setLanguage(language);
 
+
         //todo 设置初始状态
         questionSubmit.setStatus(0);
         questionSubmit.setJudgeInfo("{}");
@@ -96,8 +104,37 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "数据插入异常");
         }
 
-        //执行判题服务
-        CompletableFuture.runAsync(() -> judgeService.doJudge(questionSubmit.getId()));
+        //执行判题服务 更新题目信息
+        CompletableFuture.runAsync(() -> {
+            QuestionSubmit questionSubmit1 = judgeService.doJudge(questionSubmit.getId());
+            if (questionSubmit1.getJudgeInfo().length() >= 20)
+            {
+                System.out.println("questionSubmit1.getJudgeInfo() = " + questionSubmit1.getJudgeInfo());
+                String s = new String("{\"message\":\"Accepted\"");
+                int n = s.length();
+                String questionJudgeInfo = questionSubmit1.getJudgeInfo();
+                Boolean f = true;
+                for (int i = 0; i < n; i ++)
+                {
+                    char c = questionJudgeInfo.charAt(i);
+                    char c1 = s.charAt(i);
+                    if (questionJudgeInfo.charAt(i) != s.charAt(i))
+                    {
+                        f = false;
+                    }
+                }
+                if (f)
+                {
+                    Integer accpetNum = question.getAccpetNum();
+                    questionUpdate.setAccpetNum(accpetNum + 1);
+                }
+            }
+            boolean b = questionService.updateById(questionUpdate);
+            if (!b)
+            {
+                System.out.println("更新错误");
+            }
+        });
         return questionSubmit.getId();
 
     }
