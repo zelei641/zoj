@@ -102,3 +102,4 @@ knife4j:
 #代码沙箱配置
 codesandbox:
   type: remote
+file-save-path: D:\Javaideaporject\springboot-init//image//
